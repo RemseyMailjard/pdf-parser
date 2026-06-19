@@ -8,3 +8,13 @@ wheels/
 
 # Virtual environments
 .venv
+
+# Local directories - keep directories but ignore contents
+input/*
+!input/.gitkeep
+
+output/*
+!output/.gitkeep
+
+processed/*
+!processed/.gitkeep
