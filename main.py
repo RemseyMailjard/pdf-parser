@@ -105,29 +105,16 @@ st.markdown(
 
 st.title("📄 PDF naar Markdown Converter")
 st.write("Upload één of meerdere PDF-bestanden om ze automatisch om te zetten naar schone Markdown met LiteParse.")
-st.markdown(
-    f"""
-    <div class="rm-brand-banner">
-        <div class="rm-brand-kicker">Ontwikkeld door</div>
-        <div class="rm-brand-name">{DEVELOPER_NAME}</div>
-        <div>Portfolio, development en AI-oplossingen via <strong>Remsey</strong>.</div>
-        <div style="margin-top: 0.55rem;"><strong>Website:</strong> www.remsey.nl &nbsp;&nbsp;|&nbsp;&nbsp; <strong>LinkedIn:</strong> remseymailjard</div>
-        <div class="rm-brand-links">
-            <a href="{DEVELOPER_WEBSITE}" target="_blank">Bezoek www.remsey.nl</a>
-            <a href="{DEVELOPER_LINKEDIN}" target="_blank">Bekijk LinkedIn profiel</a>
-        </div>
-    </div>
-    """,
-    unsafe_allow_html=True,
-)
+st.caption(f"Ontwikkeld door {DEVELOPER_NAME}")
 
 # Sidebar with local storage info and history clearing
 with st.sidebar:
     st.markdown(
         f"""
         <div class="rm-sidebar-card">
-            <p><strong>Developer</strong></p>
+            <p><strong>Ontwikkeld door</strong></p>
             <p class="rm-sidebar-name">{DEVELOPER_NAME}</p>
+            <p>Portfolio, development en AI-oplossingen via Remsey.</p>
             <p><a href="{DEVELOPER_WEBSITE}" target="_blank">www.remsey.nl</a></p>
             <p><a href="{DEVELOPER_LINKEDIN}" target="_blank">linkedin.com/in/remseymailjard</a></p>
         </div>
@@ -158,9 +145,6 @@ col_upload, col_preview = st.columns([1, 1], gap="medium")
 
 with col_upload:
     st.header("1. Documenten Uploaden")
-    st.success(
-        f"Tool van {DEVELOPER_NAME} — www.remsey.nl — linkedin.com/in/remseymailjard"
-    )
     uploaded_files = st.file_uploader(
         "Upload hier je PDF-bestanden",
         type=["pdf"],
@@ -279,10 +263,15 @@ with col_preview:
 st.divider()
 st.markdown(
     f"""
-    <div class="rm-footer">
-        PDF naar Markdown Converter · ontwikkeld door {DEVELOPER_NAME} ·
-        <a href="{DEVELOPER_WEBSITE}" target="_blank">www.remsey.nl</a> ·
-        <a href="{DEVELOPER_LINKEDIN}" target="_blank">LinkedIn</a>
+    <div class="rm-brand-banner">
+        <div class="rm-brand-kicker">Ontwikkeld door</div>
+        <div class="rm-brand-name">{DEVELOPER_NAME}</div>
+        <div>Portfolio, development en AI-oplossingen via Remsey.</div>
+        <div style="margin-top: 0.55rem;">Website: www.remsey.nl &nbsp;&nbsp;|&nbsp;&nbsp; LinkedIn: remseymailjard</div>
+        <div class="rm-brand-links">
+            <a href="{DEVELOPER_WEBSITE}" target="_blank">Bezoek www.remsey.nl</a>
+            <a href="{DEVELOPER_LINKEDIN}" target="_blank">Bekijk LinkedIn profiel</a>
+        </div>
     </div>
     """,
     unsafe_allow_html=True,
