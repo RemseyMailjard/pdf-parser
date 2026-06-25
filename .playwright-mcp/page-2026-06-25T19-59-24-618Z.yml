@@ -1,0 +1,65 @@
+- generic [ref=e6]:
+  - generic [ref=e11]:
+    - heading "YouTube to Transcript" [level=1] [ref=e13]:
+      - text: YouTube to Transcript
+      - generic [ref=e14]:
+        - link "Link to heading":
+          - /url: "#you-tube-to-transcript"
+          - img
+    - paragraph [ref=e15]: Generate YouTube Transcript for FREE.
+    - paragraph [ref=e16]: Access all Transcript Languages, Easy Copy and Edit!
+  - generic [ref=e18]:
+    - tablist [ref=e20]:
+      - tab "Transcript" [ref=e21] [cursor=pointer]:
+        - paragraph [ref=e23]: Transcript
+      - tab "Search" [ref=e24] [cursor=pointer]:
+        - paragraph [ref=e26]: Search
+      - tab "Channel" [selected] [ref=e27] [cursor=pointer]:
+        - paragraph [ref=e29]: Channel
+      - tab "Playlist" [ref=e30] [cursor=pointer]:
+        - paragraph [ref=e32]: Playlist
+      - tab "API Docs" [ref=e33] [cursor=pointer]:
+        - paragraph [ref=e35]: API Docs
+    - tabpanel "Channel" [ref=e88]:
+      - generic [ref=e89]:
+        - heading "Channel Transcripts" [level=4] [ref=e95]:
+          - text: Channel Transcripts
+          - generic [ref=e96]:
+            - link "Link to heading":
+              - /url: "#channel-transcripts"
+              - img
+        - textbox "Channel URL" [ref=e101]:
+          - /placeholder: Paste YouTube channel URL...
+        - generic [ref=e103]:
+          - generic [ref=e107]:
+            - paragraph [ref=e111]: How many videos?
+            - generic [ref=e113]:
+              - generic [ref=e114]:
+                - generic [ref=e115]: First 10
+                - combobox "Selected First 10. How many videos?" [ref=e117]
+              - img "open" [ref=e119]
+          - generic [ref=e124]:
+            - paragraph [ref=e128]: Language
+            - generic [ref=e130]:
+              - generic [ref=e131]:
+                - generic [ref=e132]: English
+                - combobox "Selected English. Language" [ref=e134]
+              - img "open" [ref=e136]
+        - group [ref=e140]:
+          - generic "keyboard_arrow_right Format options" [ref=e141] [cursor=pointer]:
+            - generic [ref=e142]:
+              - generic [ref=e187]: keyboard_arrow_right
+              - paragraph [ref=e147]: Format options
+        - button "Fetch Channel Transcripts" [ref=e150] [cursor=pointer]:
+          - paragraph [ref=e154]: Fetch Channel Transcripts
+  - generic [ref=e78]:
+    - generic [ref=e79]: Built by Remsey Mailjard
+    - generic [ref=e80]:
+      - link "remsey.nl" [ref=e81] [cursor=pointer]:
+        - /url: https://www.remsey.nl
+        - img [ref=e82]
+        - text: remsey.nl
+      - link "LinkedIn" [ref=e85] [cursor=pointer]:
+        - /url: https://www.linkedin.com/in/remseymailjard/
+        - img [ref=e86]
+        - text: LinkedIn

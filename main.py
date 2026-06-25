@@ -1,5 +1,8 @@
 import streamlit as st
 import re
+import io
+import zipfile
+from datetime import datetime
 
 DEVELOPER_NAME = "Remsey Mailjard"
 DEVELOPER_WEBSITE = "https://www.remsey.nl"
@@ -238,6 +241,10 @@ if "transcript_video_id" not in st.session_state:
     st.session_state["transcript_video_id"] = None
 if "available_languages" not in st.session_state:
     st.session_state["available_languages"] = None
+if "channel_results" not in st.session_state:
+    st.session_state["channel_results"] = None
+if "channel_name" not in st.session_state:
+    st.session_state["channel_name"] = None
 
 
 def extract_video_id(url: str) -> str | None:
@@ -272,6 +279,54 @@ def format_srt_time(seconds: float) -> str:
     s = int(seconds % 60)
     ms = int((seconds % 1) * 1000)
     return f"{h:02d}:{m:02d}:{s:02d},{ms:03d}"
+
+
+def fetch_channel_videos(channel_url: str, limit: int | None = None) -> tuple[str, list[dict]]:
+    import yt_dlp
+
+    ydl_opts = {
+        "extract_flat": True,
+        "quiet": True,
+        "no_warnings": True,
+        "ignoreerrors": True,
+    }
+    if limit:
+        ydl_opts["playlistend"] = limit
+
+    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        info = ydl.extract_info(channel_url, download=False)
+
+    channel_name = info.get("channel") or info.get("uploader") or info.get("title", "Unknown Channel")
+    videos = []
+    for entry in info.get("entries", []) or []:
+        if entry and entry.get("id"):
+            videos.append({
+                "id": entry["id"],
+                "title": entry.get("title", entry["id"]),
+            })
+    return channel_name, videos
+
+
+def fetch_single_transcript(video_id: str, lang: str, fmt: str) -> dict:
+    from youtube_transcript_api import YouTubeTranscriptApi
+
+    api = YouTubeTranscriptApi()
+    transcript_list = api.list(video_id)
+
+    try:
+        fetched = transcript_list.find_transcript([lang]).fetch()
+    except Exception:
+        try:
+            fetched = transcript_list.find_transcript(["en"]).fetch()
+        except Exception:
+            first = next(iter(transcript_list))
+            fetched = first.fetch()
+
+    entries = [
+        {"text": s.text, "start": s.start, "duration": s.duration}
+        for s in fetched
+    ]
+    return format_transcript(entries, fmt)
 
 
 def format_transcript(entries, fmt: str) -> str:
@@ -432,16 +487,161 @@ with tab_search:
 
 with tab_channel:
     st.markdown("#### Channel Transcripts")
+
     channel_url = st.text_input(
         "Channel URL",
         placeholder="Paste YouTube channel URL...",
         label_visibility="collapsed",
         key="channel_input",
     )
-    st.info(
-        "Batch-fetch transcripts for all videos in a YouTube channel. "
-        "This feature is coming soon."
-    )
+
+    BATCH_OPTIONS = {
+        "First 10": 10,
+        "First 25": 25,
+        "First 50": 50,
+        "First 100": 100,
+        "All videos": None,
+    }
+
+    ch_col1, ch_col2 = st.columns([3, 2])
+    with ch_col1:
+        batch_size_label = st.selectbox(
+            "How many videos?",
+            list(BATCH_OPTIONS.keys()),
+            index=0,
+            key="channel_batch_size",
+        )
+    with ch_col2:
+        ch_lang_codes = list(LANGUAGES.keys())
+        ch_language = st.selectbox(
+            "Language",
+            ch_lang_codes,
+            format_func=lambda c: LANGUAGES[c],
+            key="channel_lang",
+        )
+
+    with st.expander("Format options"):
+        ch_format = st.selectbox(
+            "Format",
+            ["text", "timestamps", "srt"],
+            format_func=lambda x: {
+                "text": "Plain Text",
+                "timestamps": "With Timestamps",
+                "srt": "SRT Subtitles",
+            }[x],
+            key="channel_format",
+        )
+
+    ch_fetch = st.button("Fetch Channel Transcripts", type="primary", key="channel_fetch")
+
+    if ch_fetch and channel_url:
+        batch_limit = BATCH_OPTIONS[batch_size_label]
+        st.session_state["channel_results"] = None
+        st.session_state["channel_name"] = None
+
+        with st.spinner("Scanning channel for videos..."):
+            try:
+                ch_name, videos = fetch_channel_videos(channel_url, batch_limit)
+            except Exception as e:
+                st.error(f"Could not read channel: {e}")
+                videos = []
+                ch_name = None
+
+        if videos:
+            st.session_state["channel_name"] = ch_name
+            total = len(videos)
+            st.info(f"Found **{total}** videos in **{ch_name}**. Fetching transcripts...")
+
+            progress = st.progress(0, text=f"0 / {total}")
+            results = []
+
+            for idx, video in enumerate(videos):
+                try:
+                    transcript_text = fetch_single_transcript(
+                        video["id"], ch_language, ch_format
+                    )
+                    results.append({
+                        "id": video["id"],
+                        "title": video["title"],
+                        "transcript": transcript_text,
+                        "status": "success",
+                    })
+                except Exception as e:
+                    results.append({
+                        "id": video["id"],
+                        "title": video["title"],
+                        "transcript": None,
+                        "status": "failed",
+                        "error": str(e),
+                    })
+
+                progress.progress(
+                    (idx + 1) / total,
+                    text=f"{idx + 1} / {total} — {video['title'][:50]}",
+                )
+
+            st.session_state["channel_results"] = results
+            success_count = sum(1 for r in results if r["status"] == "success")
+            st.success(f"Done! {success_count} / {total} transcripts fetched successfully.")
+
+        elif ch_name is not None:
+            st.warning("No videos found in this channel.")
+
+    elif ch_fetch:
+        st.warning("Please paste a YouTube channel URL first.")
+
+    # ── Display results ──
+    if st.session_state.get("channel_results"):
+        results = st.session_state["channel_results"]
+        ch_name = st.session_state.get("channel_name", "channel")
+        successful = [r for r in results if r["status"] == "success"]
+        failed = [r for r in results if r["status"] == "failed"]
+
+        st.divider()
+
+        if successful:
+            ext = "srt" if ch_format == "srt" else "txt"
+
+            # ZIP download for all successful transcripts
+            zip_buffer = io.BytesIO()
+            with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zf:
+                for r in successful:
+                    safe_title = re.sub(r'[^\w\s-]', '', r["title"])[:60].strip()
+                    zf.writestr(f"{safe_title}.{ext}", r["transcript"])
+
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            safe_ch = re.sub(r'[^\w\s-]', '', ch_name)[:40].strip()
+
+            st.download_button(
+                label=f"Download All ({len(successful)} transcripts as ZIP)",
+                data=zip_buffer.getvalue(),
+                file_name=f"{safe_ch}_transcripts_{timestamp}.zip",
+                mime="application/zip",
+                use_container_width=True,
+                key="channel_zip_dl",
+            )
+
+            for r in successful:
+                with st.expander(f"{r['title']}", expanded=False):
+                    st.text_area(
+                        "transcript",
+                        value=r["transcript"],
+                        height=200,
+                        label_visibility="collapsed",
+                        key=f"ch_preview_{r['id']}",
+                    )
+                    st.download_button(
+                        label=f"Download .{ext}",
+                        data=r["transcript"],
+                        file_name=f"{re.sub(r'[^\\w\\s-]', '', r['title'])[:60].strip()}.{ext}",
+                        mime="text/plain",
+                        key=f"ch_dl_{r['id']}",
+                    )
+
+        if failed:
+            with st.expander(f"Failed ({len(failed)} videos)", expanded=False):
+                for r in failed:
+                    st.caption(f"**{r['title']}** — {r.get('error', 'Unknown error')}")
 
 with tab_playlist:
     st.markdown("#### Playlist Transcripts")
