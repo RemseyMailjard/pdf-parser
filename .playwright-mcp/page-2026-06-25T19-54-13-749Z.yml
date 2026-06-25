@@ -1,0 +1,60 @@
+- generic [ref=e6]:
+  - generic [ref=e11]:
+    - heading "YouTube to Transcript" [level=1] [ref=e13]:
+      - text: YouTube to Transcript
+      - generic [ref=e14]:
+        - link "Link to heading":
+          - /url: "#you-tube-to-transcript"
+          - img
+    - paragraph [ref=e15]: Generate YouTube Transcript for FREE.
+    - paragraph [ref=e16]: Access all Transcript Languages, Easy Copy and Edit!
+  - generic [ref=e18]:
+    - tablist [ref=e20]:
+      - tab "Transcript" [selected] [ref=e21] [cursor=pointer]:
+        - paragraph [ref=e23]: Transcript
+      - tab "Search" [ref=e24] [cursor=pointer]:
+        - paragraph [ref=e26]: Search
+      - tab "Channel" [ref=e27] [cursor=pointer]:
+        - paragraph [ref=e29]: Channel
+      - tab "Playlist" [ref=e30] [cursor=pointer]:
+        - paragraph [ref=e32]: Playlist
+      - tab "API Docs" [ref=e33] [cursor=pointer]:
+        - paragraph [ref=e35]: API Docs
+    - tabpanel "Transcript" [ref=e37]:
+      - generic [ref=e38]:
+        - heading "Get Transcript" [level=4] [ref=e44]:
+          - text: Get Transcript
+          - generic [ref=e45]:
+            - link "Link to heading":
+              - /url: "#get-transcript"
+              - img
+        - generic [ref=e47]:
+          - textbox "YouTube URL" [ref=e54]:
+            - /placeholder: Paste YouTube URL here...
+          - button "Get Transcript" [ref=e59] [cursor=pointer]:
+            - paragraph [ref=e63]: Get Transcript
+        - group [ref=e66]:
+          - generic "keyboard_arrow_right Language & format options" [active] [ref=e67] [cursor=pointer]:
+            - generic [ref=e68]:
+              - generic [ref=e70]: keyboard_arrow_right
+              - paragraph [ref=e73]: Language & format options
+          - generic [ref=e77]:
+            - generic [ref=e81]:
+              - paragraph [ref=e85]: Language
+              - generic [ref=e87]:
+                - generic [ref=e88]:
+                  - generic [ref=e89]: English
+                  - combobox "Selected English. Language" [ref=e91]
+                - img "open" [ref=e93]
+            - generic [ref=e98]:
+              - paragraph [ref=e102]: Format
+              - generic [ref=e104]:
+                - generic [ref=e105]:
+                  - generic [ref=e106]: Plain Text
+                  - combobox "Selected Plain Text. Format" [ref=e108]
+                - img "open" [ref=e110]
+  - generic [ref=e116]:
+    - text: Built by
+    - link "Remsey Mailjard" [ref=e117] [cursor=pointer]:
+      - /url: https://www.remsey.nl
+    - text: · Powered by youtube-transcript-api & yt-dlp
